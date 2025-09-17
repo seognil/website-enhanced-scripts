@@ -19,8 +19,8 @@
   /** 本地 indexedDB，用于后续分析 */
 
   const dbPut = (tableName, key, value) => {
-    // console.log("[lcdebug 4e850b]", tableName, key, value);
-    dbUtil.put("bilibili-videos", tableName, key, value);
+    console.log("[lcdebug 4e850b]", tableName, key, value);
+    dbUtil.put("bilibili-videos", tableName, key, { time: Date.now(), ...value });
   };
 
   // * ================================================================================ rarity color
@@ -81,10 +81,10 @@
         .filter((e) => e.bvid)
         .forEach((e) => {
           setCardStat(e.bvid, {
+            title: e.title,
             bvid: e.bvid,
             cid: e.cid,
             author: e.owner.name,
-            title: e.title,
             view: e.stat.view,
             like: e.stat.like,
           });
@@ -95,10 +95,10 @@
         .filter((e) => e.type === "video")
         .forEach((e) => {
           setCardStat(e.bvid, {
+            title: e.title,
             bvid: e.bvid,
             aid: e.aid,
             author: e.author,
-            title: e.title,
             view: e.play,
             like: e.like,
           });
@@ -109,10 +109,10 @@
         ?.filter((e) => e.type === "video")
         .forEach((e) => {
           setCardStat(e.bvid, {
+            title: e.title,
             bvid: e.bvid,
             aid: e.aid,
             author: e.author,
-            title: e.title,
             view: e.play,
             like: e.like,
           });
@@ -133,10 +133,10 @@
           /** home page load more */
           res.data.item?.forEach((e) => {
             setCardStat(e.bvid, {
+              title: e.title,
               bvid: e.bvid,
               cid: e.cid,
               author: e.owner.name,
-              title: e.title,
               view: e.stat.view,
               like: e.stat.like,
             });
@@ -145,11 +145,11 @@
           /** c page load more */
           res.data.archives?.forEach((e) => {
             setCardStat(e.bvid, {
+              title: e.title,
               bvid: e.bvid,
               aid: e.aid,
               cid: e.cid,
               author: e.author.name,
-              title: e.title,
               view: e.stat.view,
               like: e.stat.like,
             });
@@ -161,10 +161,10 @@
           const res = await response.json();
           res.data.result?.forEach((e) => {
             setCardStat(e.bvid, {
+              title: e.title,
               bvid: e.bvid,
               aid: e.aid,
               author: e.author,
-              title: e.title,
               view: e.play,
               like: e.like,
             });
@@ -178,10 +178,10 @@
             .filter((data) => data.type === "video")
             .forEach((e) => {
               setCardStat(e.bvid, {
+                title: e.title,
                 bvid: e.bvid,
                 aid: e.aid,
                 author: e.author,
-                title: e.title,
                 view: e.play,
                 like: e.like,
               });
@@ -295,11 +295,11 @@
       if (!s) return;
 
       setVideoStat(s.bvid, {
+        title: s.title,
         bvid: s.bvid,
         aid: s.aid,
         cid: s.cid,
         author: s.owner.name,
-        title: s.title,
         view: s.stat.view,
         like: s.stat.like,
         coin: s.stat.coin,
@@ -327,11 +327,11 @@
         const res = JSON.parse(xhr.responseText);
         const v = res.data.View;
         setVideoStat(v.bvid, {
+          title: v.title,
           bvid: v.bvid,
           aid: v.aid,
           cid: v.cid,
           author: v.owner.name,
-          title: v.title,
           view: v.stat.view,
           like: v.stat.like,
           coin: v.stat.coin,
@@ -397,12 +397,12 @@
 
     /**
      * @param {number} epid
-     * @param {BangumiStat & Record<any,any>} stat
+     * @param {BangumiStat & Record<any,any>} patch
      */
-    const setBangumiStat = (epid, stat) => {
+    const setBangumiStat = (epid, patch) => {
       bangumiStatMap.set(epid, {
-        ...(bangumiStatMap.get(epid) ?? {}),
-        ...stat,
+        ...(bangumiStatMap.get(epid) ?? { season_title: "", episode_title: "" }),
+        ...patch,
       });
 
       dbPut("bvid", epid, bangumiStatMap.get(epid));
@@ -411,30 +411,30 @@
     // * -------------------------------- ssr bind
 
     document.addEventListener("DOMContentLoaded", () => {
-      /** @type {Window & {__NEXT_DATA__:Object}} */
       // @ts-ignore
-      const win = window;
-      if (!win.__NEXT_DATA__) return;
+      if (!window.__NEXT_DATA__ || !playurlSSRData) return;
 
-      const r = win.__NEXT_DATA__.props.pageProps.dehydratedState.queries[0].state.data.data.result;
-      const info = r.supplement.ogv_episode_info;
+      // @ts-ignore
+      const d1 = playurlSSRData?.data.result;
 
-      const d = win.__NEXT_DATA__.props.pageProps.dehydratedState.queries[1].state.data;
-      const stat = d.stat;
+      // @ts-ignore
+      const d2 = window.__NEXT_DATA__?.props.pageProps.dehydratedState.queries[0].state.data;
 
-      setBangumiStat(info.episode_id, {
-        bvid: r.arc.bvid,
-        aid: r.arc.aid,
-        cid: r.arc.cid,
-        season_id: d.season_id,
-        season_title: d.season_title,
-        episode_id: info.episode_id,
-        episode_title: info.long_title,
-        view: stat.views,
-        like: stat.likes,
-        coin: stat.coins,
-        favorite: stat.favorites,
-        share: stat.share,
+      const episode_id = d1?.supplement.ogv_episode_info.episode_id;
+
+      setBangumiStat(episode_id, {
+        season_title: d2?.season_title,
+        episode_title: d1?.supplement.ogv_episode_info.long_title ?? d2?.season_title,
+        season_id: d1?.supplement.ogv_season_info.season_id,
+        episode_id: d1?.supplement.ogv_episode_info.episode_id,
+        bvid: d1?.arc.bvid,
+        aid: d1?.arc.aid,
+        cid: d1?.arc.cid,
+        view: d2?.stat.views,
+        like: d2?.stat.likes,
+        coin: d2?.stat.coins,
+        favorite: d2?.stat.favorites,
+        share: d2?.stat.share,
       });
       updater();
     });

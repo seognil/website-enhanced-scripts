@@ -43,6 +43,9 @@
     return { main, videos };
   };
 
+  /** @param {string} text */
+  const toast = (text) => mediaControl.toast(getVideos().main.parentElement.parentElement, text);
+
   // * ---------------------------------------------------------------- global solo playing
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -63,7 +66,7 @@
         clearInterval(ticker);
         ticker = setInterval(bust, 600000);
       },
-      true
+      true,
     );
     document.addEventListener("pause", () => clearInterval(ticker), true);
   }
@@ -117,20 +120,29 @@
 
   let captionUrl;
 
+  // * ----------------
   const obs = new PerformanceObserver((list) => {
-    /** get caption url directly, it has poToken and works */
+    /** get caption url directly, it has poToken and it works */
     const url = list.getEntries().find((e) => e.name.includes("/api/timedtext"))?.name;
     if (url) captionUrl = url;
   });
   obs.observe({ entryTypes: ["resource"] });
 
+  // @ts-ignore
+  window.navigation.addEventListener("navigate", () => {
+    captionUrl = undefined;
+  });
+
+  // * ----------------
+
   const copyCaption = async () => {
-    if (!captionUrl) return;
+    if (!captionUrl) return toast("无字幕");
     const res = await fetch(captionUrl).then((e) => e.text());
     const captionText = JSON.parse(res)
-      .events.map((e) => e.segs?.map((e) => e.utf8).join(""))
-      .join("");
+      .events.map((e) => e.segs?.map((e) => e.utf8).join(" "))
+      .join(" ");
     navigator.clipboard.writeText(captionText);
+    toast("复制字幕");
   };
 
   // * ---------------------------------------------------------------- hotkey
@@ -152,9 +164,6 @@
 
       // * ----------------
 
-      /** @param {string} text */
-      const toast = (text) => mediaControl.toast(ytbVideo.parentElement.parentElement, text);
-
       /** @param {HTMLVideoElement} video */
       const toastPlaybackSpeed = (video) => {
         const curRatio = video?.playbackRate;
@@ -165,8 +174,8 @@
 
       if (false) "";
       // * ---------------- playlist
-      else if (e.key === "[" || e.key === "PageUp") e.preventDefault(), playlistJump(-1);
-      else if (e.key === "]" || e.key === "PageDown") e.preventDefault(), playlistJump(1);
+      else if (e.key === "[" || e.key === "PageUp") (e.preventDefault(), playlistJump(-1));
+      else if (e.key === "]" || e.key === "PageDown") (e.preventDefault(), playlistJump(1));
       // * ---------------- play speed
       else if (!(e.ctrlKey || e.metaKey || e.shiftKey) && e.key === "z") {
         mc.setPlaybackSpeedBy(ytbVideo, -speedStep, speedRange);
@@ -191,7 +200,6 @@
       else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "d") {
         e.preventDefault();
         copyCaption();
-        toast("复制字幕");
       }
     });
 
@@ -271,7 +279,7 @@
         media.addEventListener("timeupdate", updateHandler);
         mediasFlag.set(media, updateHandler);
       },
-      true
+      true,
     );
   }
 
