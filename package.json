@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "dev": "bun build --watch src/bilibili-like-ratio/index.ts --format=iife  --outfile=dist/bilibili-like-ratio-build.js",
+    "build": "bun build src/bilibili-like-ratio/index.ts --format=iife --outfile=dist/bilibili-like-ratio-build.js"
+  }
+}
