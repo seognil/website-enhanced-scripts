@@ -1,7 +1,8 @@
-import { URL_PATTERN } from "../routes/url-pattern";
+import { URL_PATTERN } from "./router";
 import { fetchHook, xhrHook } from "../utils/net-hook";
 import { updateVideoData } from "../data/store";
-import { renderVideoStat } from "../render/video-stat";
+import { renderVideoStat } from "../logic/video-stat";
+import { getBvid } from "../logic/get-bvid";
 
 // * ================================================================================
 
@@ -96,8 +97,6 @@ if (URL_PATTERN.video.test(location.href) || URL_PATTERN.list.test(location.href
   const renderWrap = (url = location.href) => {
     const statEls = Array.from(document.querySelector(".video-toolbar-left-main").children).map((el) => el.querySelector(".video-toolbar-left-item")) as HTMLElement[];
 
-    const key = new URL(url).searchParams.get("bvid") ?? url.match(/\bBV[^/?]+\b/)?.[0];
-
-    renderVideoStat(statEls, key);
+    renderVideoStat(statEls, getBvid(url));
   };
 }

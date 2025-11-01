@@ -10,4 +10,6 @@ export const URL_PATTERN = {
 
   video: new URLPattern("/video/*", "https://www.bilibili.com"),
   list: new URLPattern("/list/*", "https://www.bilibili.com"),
+
+  watchlater: new URLPattern("/watchlater/*", "https://www.bilibili.com"),
 };

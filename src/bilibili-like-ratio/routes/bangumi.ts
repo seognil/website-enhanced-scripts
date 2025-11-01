@@ -1,7 +1,7 @@
-import { URL_PATTERN } from "../routes/url-pattern";
+import { URL_PATTERN } from "./router";
 import { xhrHook } from "../utils/net-hook";
 import { updateVideoData } from "../data/store";
-import { renderVideoStat } from "../render/video-stat";
+import { renderVideoStat } from "../logic/video-stat";
 
 // * ================================================================================
 

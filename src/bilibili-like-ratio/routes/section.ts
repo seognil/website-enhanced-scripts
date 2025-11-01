@@ -1,7 +1,7 @@
-import { URL_PATTERN } from "../routes/url-pattern";
+import { URL_PATTERN } from "./router";
 import { updateVideoData } from "../data/store";
 import { fetchHook } from "../utils/net-hook";
-import { renderCardRatio } from "../render/cardlist-stat";
+import { renderCardRatio } from "../logic/cardlist-stat";
 
 // * ================================================================================
 

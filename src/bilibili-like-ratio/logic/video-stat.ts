@@ -1,5 +1,5 @@
 import { videoInfoStore } from "../data/store";
-import { ratioColor } from "../utils/color-map";
+import { ratioColor } from "./color-map";
 
 // * ================================================================================
 

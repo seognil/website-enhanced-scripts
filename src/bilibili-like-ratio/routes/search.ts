@@ -1,7 +1,7 @@
-import { URL_PATTERN } from "../routes/url-pattern";
+import { URL_PATTERN } from "./router";
 import { updateVideoData } from "../data/store";
 import { fetchHook } from "../utils/net-hook";
-import { renderCardRatio } from "../render/cardlist-stat";
+import { renderCardRatio } from "../logic/cardlist-stat";
 
 // * ================================================================================
 
@@ -83,6 +83,6 @@ if (URL_PATTERN.search.test(location.href)) {
      * dom 可能复用，但是新数据可能之后才获取到，所以 fetch 之后再 force render
      * 列表页也不存在下拉刷新，所以干脆手动控制全部渲染动作，不用 observer 实现
      */
-    document.querySelectorAll(".bili-video-card").forEach((el) => renderCardRatio(el as HTMLElement, true));
+    document.querySelectorAll(".bili-video-card").forEach((el) => renderCardRatio(el as HTMLElement));
   };
 }

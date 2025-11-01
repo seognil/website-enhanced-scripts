@@ -1,7 +1,8 @@
 import { videoInfoStore } from "../data/store";
-import { ratioColor } from "../utils/color-map";
+import { ratioColor } from "./color-map";
+import { getBvid } from "./get-bvid";
 
-// * ================================================================================ 
+// * ================================================================================
 
 // * ---------------------------------------------------------------- card list item render ratio
 
@@ -12,15 +13,14 @@ import { ratioColor } from "../utils/color-map";
  * search: .video-list .bili-video-card .bili-video-card__stats .bili-video-card__stats--left ( > .bili-video-card__stats--item * 2 )
  * section: .feed-card .bili-video-card .bili-cover-card__stats ( > .bili-cover-card__stat * 3 )
  */
-export const renderCardRatio = (cardEl: HTMLElement, force = false) => {
+export const renderCardRatio = (cardEl: HTMLElement) => {
   // * -------------------------------- stats bar container el check
 
   const barEl = cardEl.querySelector(".bili-video-card__stats--left, .bili-cover-card__stats");
 
   if (!barEl) return;
-  // * if already loaded
+
   let itemEl = barEl.querySelector(".like-ratio");
-  if (!force && itemEl) return;
 
   // * -------------------------------- dom structure
 
@@ -34,11 +34,11 @@ export const renderCardRatio = (cardEl: HTMLElement, force = false) => {
     itemEl.appendChild(textEl);
 
     /**
-     * section: children * 3
+     * section: children * 3, insert before last
      * home, search: left > children * 2
      */
     if (barEl.classList.contains("bili-cover-card__stats")) {
-      barEl.insertBefore(itemEl, barEl.children[2]);
+      barEl.insertBefore(itemEl, barEl.children[barEl.children.length - 1]);
     } else {
       barEl.appendChild(itemEl);
     }
@@ -46,8 +46,7 @@ export const renderCardRatio = (cardEl: HTMLElement, force = false) => {
 
   // * -------------------------------- data
 
-  const url = cardEl.querySelector("a")?.href;
-  const bvid = url?.match(/video\/([^/?]+)\b/)?.[1];
+  const bvid = getBvid(cardEl.querySelector("a")?.href);
 
   const s = videoInfoStore.get(bvid);
   if (!s) return;
