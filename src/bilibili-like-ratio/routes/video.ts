@@ -33,10 +33,7 @@ if (URL_PATTERN.video.test(location.href) || URL_PATTERN.list.test(location.href
 
     updateWrap(data, "video ssr");
 
-    // ! 等待一段时间，不然B站会二次刷新，原因未知
-    setTimeout(() => {
-      renderWrap();
-    }, 2000);
+    renderWrap();
   });
 
   // * ---------------- fetch

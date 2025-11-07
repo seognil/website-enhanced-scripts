@@ -17,13 +17,17 @@ export const renderVideoStat = (statEls: HTMLElement[], key: string) => {
       if (spanEl) {
         return spanEl;
       } else {
+        itemEl.style.width = "auto";
+        const shadowEl = itemEl.attachShadow({ mode: "open" });
+        shadowEl.appendChild(document.createElement("slot"));
+
         const spanEl = document.createElement("span");
         spanEl.classList.add("stat-ratio");
 
         spanEl.style.filter = "brightness(80%)";
         spanEl.style.whiteSpace = "pre-wrap";
-        itemEl.style.width = "auto";
-        itemEl.appendChild(spanEl);
+
+        shadowEl.appendChild(spanEl);
 
         return spanEl;
       }

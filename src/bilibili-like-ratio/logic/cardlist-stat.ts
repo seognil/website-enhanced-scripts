@@ -18,7 +18,7 @@ export const renderCardRatio = (cardEl: HTMLElement) => {
 
   const barEl = cardEl.querySelector(".bili-video-card__stats--left, .bili-cover-card__stats");
 
-  if (!barEl) return;
+  if (!barEl?.firstElementChild) return;
 
   let itemEl = barEl.querySelector(".like-ratio");
 
@@ -28,7 +28,9 @@ export const renderCardRatio = (cardEl: HTMLElement) => {
     itemEl = barEl.firstElementChild.cloneNode() as HTMLElement;
     itemEl.classList.add("like-ratio");
 
-    itemEl.appendChild(thumbsupEl.cloneNode(true));
+    const thumbEl = thumbsupEl.cloneNode(true) as HTMLElement;
+    thumbEl.style.visibility = "hidden";
+    itemEl.appendChild(thumbEl);
 
     const textEl = barEl.firstElementChild.querySelector("span").cloneNode() as HTMLElement;
     itemEl.appendChild(textEl);
@@ -54,6 +56,7 @@ export const renderCardRatio = (cardEl: HTMLElement) => {
 
   // * -------------------------------- update render
 
+  itemEl.querySelector("svg").style.visibility = "initial";
   const textEl = itemEl.querySelector("span");
   textEl.textContent = (ratio * 100).toFixed(1) + "%";
   textEl.style.color = ratioColor(ratio);
