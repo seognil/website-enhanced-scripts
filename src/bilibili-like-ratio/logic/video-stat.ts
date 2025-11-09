@@ -12,7 +12,7 @@ export const renderVideoStat = (statEls: HTMLElement[], key: string) => {
     // * -------------------------------- dom structure
 
     .map((itemEl) => {
-      const spanEl = itemEl.querySelector(".stat-ratio") as HTMLElement;
+      const spanEl = itemEl.shadowRoot?.querySelector(".stat-ratio") as HTMLElement;
 
       if (spanEl) {
         return spanEl;
